@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mancing Mania — Biotik & Abiotik • SMK Kelas X</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --deep:#04223c; --panel:#0b2540; --panel2:#082036; --line:#164e63; --line2:#1e5a7a;
+  --ink:#eaf6ff; --mut:#8fb6d4;
+  --sun:#fbbf24; --coral:#fb7185; --sea:#22d3ee; --ok:#34d399; --no:#f87171;
+  --wood:#b0722f; --hard:#02182b;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:'Nunito',sans-serif;color:var(--ink);min-height:100vh;
+  background:
+    radial-gradient(1000px 460px at 50% -10%, #0a4470 0%, transparent 60%),
+    radial-gradient(700px 420px at 90% 110%, rgba(34,211,238,.12), transparent 70%),
+    var(--deep);
+}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;
+  background:radial-gradient(circle, rgba(255,255,255,.045) 1.5px, transparent 1.5px);
+  background-size:30px 30px;}
+.hidden{display:none!important}
+.page{max-width:1140px;margin:0 auto;padding:16px 16px 44px;position:relative;z-index:1}
+
+/* ---------- HUD ---------- */
+.hud{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;
+  background:linear-gradient(180deg,#0d2c4d,#0a2340);border:2px solid var(--line);
+  border-radius:16px;padding:12px 18px;box-shadow:0 8px 0 var(--hard);margin-bottom:10px}
+.brand{display:flex;align-items:center;gap:12px}
+.brand-badge{width:52px;height:52px;border-radius:14px;display:grid;place-items:center;font-size:1.7rem;
+  background:linear-gradient(160deg,#0ea5e9,#0369a1);border:2px solid #67e8f9;box-shadow:0 4px 0 var(--hard);
+  animation:badgeBob 3s ease-in-out infinite}
+@keyframes badgeBob{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-4px) rotate(3deg)}}
+.brand h1{font-family:'Baloo 2';font-size:clamp(1.3rem,3.4vw,1.9rem);line-height:1;letter-spacing:.02em;text-shadow:3px 3px 0 var(--hard)}
+.brand h1 em{font-style:normal;color:var(--sun);display:inline-block;transform:rotate(-1.5deg)}
+.brand p{font-size:.74rem;font-weight:800;color:var(--mut);letter-spacing:.07em;margin-top:2px}
+.chips{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.chip{display:flex;align-items:center;gap:8px;background:var(--panel2);border:2px solid var(--line);
+  border-radius:12px;padding:7px 13px;box-shadow:0 3px 0 var(--hard)}
+.chip .ic{font-size:1.15rem}
+.chip .lab{font-size:.6rem;font-weight:900;letter-spacing:.12em;color:var(--mut);display:block;line-height:1}
+.chip .val{font-family:'Baloo 2';font-size:1.15rem;line-height:1.05}
+.chip.time .val{color:var(--sun);font-size:1.35rem;min-width:66px}
+.chip.time.danger{border-color:var(--no);animation:dangerPulse .6s ease-in-out infinite alternate}
+.chip.time.danger .val{color:var(--no)}
+@keyframes dangerPulse{to{box-shadow:0 3px 0 var(--hard),0 0 18px rgba(248,113,113,.6)}}
+.chip.fish .val{color:var(--sea)}
+.hull{width:110px;height:12px;background:#051a2e;border:2px solid var(--line);border-radius:99px;overflow:hidden}
+#hullFill{height:100%;width:100%;background:linear-gradient(90deg,#34d399,#a3e635);border-radius:99px;transition:width .5s,background .5s}
+#hullFill.mid{background:linear-gradient(90deg,#fbbf24,#fb923c)}
+#hullFill.low{background:linear-gradient(90deg,#ef4444,#f87171)}
+.icon-btn{background:var(--panel2);border:2px solid var(--line);color:var(--ink);width:42px;height:42px;
+  border-radius:10px;font-size:1.05rem;cursor:pointer;transition:.15s;box-shadow:0 3px 0 var(--hard)}
+.icon-btn:hover{transform:translateY(-2px);border-color:var(--sea)}
+.time-bar{height:8px;background:#051a2e;border:2px solid var(--line);border-radius:99px;overflow:hidden;margin-bottom:14px}
+#timeBar{height:100%;width:100%;background:linear-gradient(90deg,#0ea5e9,var(--sea));transition:width 1s linear}
+#timeBar.low{background:linear-gradient(90deg,#dc2626,var(--no))}
+
+/* ---------- panggung laut ---------- */
+.sea-wrap{position:relative;border:2px solid var(--line);border-radius:18px;overflow:hidden;
+  box-shadow:0 10px 0 var(--hard);margin-bottom:16px;background:#0a3a63}
+.sea-wrap.shake{animation:hudShake .45s}
+@keyframes hudShake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(7px)}60%{transform:translateX(-5px)}80%{transform:translateX(3px)}}
+#sea{display:block;width:100%;height:auto}
+.scene-legend{position:absolute;left:12px;bottom:12px;display:flex;gap:8px;flex-wrap:wrap}
+.lg{font-size:.68rem;font-weight:900;letter-spacing:.05em;padding:5px 11px;border-radius:99px;border:2px solid}
+.lg.bio{background:#052e22cc;color:#6ee7b7;border-color:#0b7a55}
+.lg.abio{background:#082f49cc;color:#7dd3fc;border-color:#0e7490}
+.flash{position:absolute;inset:0;background:radial-gradient(circle,transparent 40%,rgba(239,68,68,.4));opacity:0;pointer-events:none}
+
+/* animasi elemen SVG */
+#boatBob{animation:bob 4.2s ease-in-out infinite;transform-box:fill-box;transform-origin:50% 55%}
+@keyframes bob{0%,100%{transform:translateY(0) rotate(-.8deg)}50%{transform:translateY(-7px) rotate(1deg)}}
+#boatArt{transform-box:fill-box;transform-origin:50% 78%}
+#boatBob,#reel{transition:opacity .6s}
+.sunk{opacity:0!important}
+#bigShip{transition:opacity 1.1s ease,transform 1.1s cubic-bezier(.2,1.2,.4,1)}
+.w1{animation:waveX 6s linear infinite}
+.w2{animation:waveX 9s linear infinite reverse}
+.w3{animation:waveX 4.2s linear infinite}
+@keyframes waveX{to{transform:translateX(-120px)}}
+.sun-rays{animation:spin 38s linear infinite;transform-box:fill-box;transform-origin:center}
+@keyframes spin{to{transform:rotate(360deg)}}
+.cloudA{animation:drift 75s linear infinite;animation-delay:-30s}
+.cloudB{animation:drift 100s linear infinite;animation-delay:-62s}
+@keyframes drift{from{transform:translateX(-280px)}to{transform:translateX(1480px)}}
+.birds{animation:drift 48s linear infinite;animation-delay:-12s}
+.swimmer{animation:swimAcross var(--d,18s) linear infinite;animation-delay:var(--dl,0s)}
+.swimmer.rev{animation-name:swimAcrossR}
+@keyframes swimAcross{to{transform:translateX(-1500px)}}
+@keyframes swimAcrossR{to{transform:translateX(1500px)}}
+.fishbob{animation:fishBob 3.4s ease-in-out infinite}
+@keyframes fishBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
+.bubble{animation:bubbleUp var(--d,8s) linear infinite;animation-delay:var(--dl,0s)}
+@keyframes bubbleUp{0%{transform:translateY(0);opacity:.75}85%{opacity:.75}100%{transform:translateY(var(--h,-260px));opacity:0}}
+.weed{animation:weedSway 3.6s ease-in-out infinite alternate;transform-box:fill-box;transform-origin:50% 100%}
+@keyframes weedSway{from{transform:rotate(-6deg)}to{transform:rotate(6deg)}}
+.ray{animation:rayGlow 6s ease-in-out infinite alternate}
+@keyframes rayGlow{from{opacity:.03}to{opacity:.09}}
+.puff{animation:puff 3.4s ease-out infinite}
+@keyframes puff{0%{transform:translate(0,0) scale(.6);opacity:.7}100%{transform:translate(26px,-64px) scale(1.7);opacity:0}}
+.floatfx{font-family:'Baloo 2';font-weight:800;font-size:34px;paint-order:stroke;stroke:#04223c;stroke-width:7px}
+.bobberF{animation:bobF 2.2s ease-in-out infinite}
+@keyframes bobF{0%,100%{transform:translateY(0)}50%{transform:translateY(4px)}}
+
+/* ---------- kartu soal ---------- */
+.qcard{background:var(--panel);border:2px solid var(--line);border-radius:18px;padding:22px 24px 24px;
+  box-shadow:0 10px 0 var(--hard);position:relative;overflow:hidden}
+.qcard::before{content:'';position:absolute;top:0;left:0;right:0;height:6px;
+  background:repeating-linear-gradient(90deg,var(--sea) 0 26px,#0ea5e9 26px 52px)}
+.q-head{display:flex;align-items:center;gap:12px;margin:6px 0 14px;flex-wrap:wrap}
+.q-badge{font-family:'Baloo 2';font-weight:800;background:var(--sun);color:#3b2405;padding:5px 15px;
+  border-radius:9px;transform:skewX(-8deg);box-shadow:0 3px 0 #b97a00;letter-spacing:.05em}
+.q-cat{font-size:.68rem;font-weight:900;letter-spacing:.14em;padding:5px 12px;border-radius:99px;border:2px solid;text-transform:uppercase}
+.c-biotik{color:#6ee7b7;border-color:#0b7a55;background:#052e22}
+.c-abiotik{color:#7dd3fc;border-color:#0e7490;background:#082f49}
+.c-konsep{color:#fcd34d;border-color:#b97a00;background:#3a2a05}
+.c-inter{color:#fda4af;border-color:#be123c;background:#3d0a15}
+.c-rantai{color:#fdba74;border-color:#c2570b;background:#3a1c05}
+.q-text{font-size:clamp(1.05rem,2.3vw,1.3rem);font-weight:900;line-height:1.5;margin-bottom:18px}
+.options{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.opt{display:flex;align-items:center;gap:12px;text-align:left;background:var(--panel2);border:2px solid var(--line2);
+  border-radius:12px;padding:12px 14px;font:700 1rem 'Nunito';color:var(--ink);cursor:pointer;
+  transition:transform .15s,border-color .15s,box-shadow .15s}
+.opt:hover:not(:disabled){transform:translateY(-3px);border-color:var(--sea);box-shadow:0 8px 0 -4px var(--hard)}
+.opt:active:not(:disabled){transform:translateY(0)}
+.opt .key{flex:0 0 36px;height:36px;display:grid;place-items:center;background:linear-gradient(180deg,#22d3ee,#0ea5e9);
+  color:#04223c;font-family:'Baloo 2';font-weight:800;font-size:1.1rem;border-radius:9px;box-shadow:0 3px 0 #075e78}
+.opt.is-correct{border-color:var(--ok);background:#0a332a}
+.opt.is-correct .key{background:linear-gradient(180deg,#4ade80,#16a34a);box-shadow:0 3px 0 #0b5e30;color:#052e1f}
+.opt.is-wrong{border-color:var(--no);background:#331519;animation:hudShake .4s}
+.opt.is-wrong .key{background:linear-gradient(180deg,#f87171,#dc2626);box-shadow:0 3px 0 #7f1d1d;color:#fff}
+.opt.is-dim{opacity:.4}
+.feedback{margin-top:18px;display:flex;flex-direction:column;gap:12px;animation:riseIn .35s ease-out}
+@keyframes riseIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.fb-banner{font-family:'Baloo 2';font-weight:800;font-size:1.06rem;padding:12px 16px;border-radius:10px;letter-spacing:.02em}
+.fb-banner.ok{background:linear-gradient(90deg,#064e3b,#0d7a56);border:2px solid var(--ok);color:#d1fae5}
+.fb-banner.no{background:linear-gradient(90deg,#571220,#7f1d2b);border:2px solid var(--no);color:#fecaca}
+.fb-info{background:#071e33;border-left:5px solid var(--sea);border-radius:8px;padding:12px 14px;
+  font-size:.95rem;font-weight:700;color:#c6ddf2;line-height:1.5}
+.btn-next{align-self:flex-start;font-family:'Baloo 2';font-weight:800;font-size:1.05rem;letter-spacing:.04em;
+  background:linear-gradient(180deg,var(--sun),#f59e0b);color:#3b2405;border:none;padding:13px 28px;
+  border-radius:12px;cursor:pointer;box-shadow:0 5px 0 #9a5600;transition:.15s}
+.btn-next:hover{transform:translateY(-2px);box-shadow:0 7px 0 #9a5600}
+.btn-next:active{transform:translateY(3px);box-shadow:0 1px 0 #9a5600}
+footer{margin-top:22px;text-align:center;font-size:.78rem;font-weight:800;color:#5f86a8;letter-spacing:.06em}
+
+/* ---------- overlay ---------- */
+.overlay{position:fixed;inset:0;z-index:50;background:rgba(2,14,28,.87);backdrop-filter:blur(5px);
+  display:grid;place-items:center;padding:20px;overflow:hidden}
+.ov-card{position:relative;background:var(--panel);border:3px solid var(--line);border-radius:22px;max-width:640px;
+  width:100%;padding:34px 30px 30px;text-align:center;box-shadow:0 16px 0 var(--hard);
+  animation:ovIn .45s cubic-bezier(.2,1.4,.4,1);max-height:94vh;overflow-y:auto}
+@keyframes ovIn{from{opacity:0;transform:scale(.85) translateY(30px)}to{opacity:1;transform:none}}
+.ov-card.gold{border-color:var(--sun)}
+.ov-card.doom{border-color:#7f1d1d;background:#180a12}
+.ov-kick{display:inline-block;font-size:.68rem;font-weight:900;letter-spacing:.22em;color:#04223c;background:var(--sea);
+  padding:5px 15px;border-radius:99px;margin-bottom:14px;transform:rotate(-2deg)}
+.ov-kick.gold{background:var(--sun)} .ov-kick.doom{background:var(--no);color:#fff}
+.ov-title{font-family:'Baloo 2';font-weight:800;font-size:clamp(1.9rem,5.5vw,2.9rem);line-height:1.05;text-shadow:4px 4px 0 var(--hard)}
+.ov-title span{color:var(--sun);display:inline-block;transform:rotate(-1.5deg)}
+.ov-sub{color:var(--mut);font-weight:800;margin:10px 0 20px;font-size:.95rem;line-height:1.5}
+.rules{list-style:none;text-align:left;margin:0 auto 22px;max-width:480px;display:flex;flex-direction:column;gap:9px}
+.rules li{background:#071e33;border:2px solid var(--line);border-radius:10px;padding:9px 13px;font-size:.86rem;font-weight:700;line-height:1.45}
+.rules b{color:var(--sun)}
+.btn-big{font-family:'Baloo 2';font-weight:800;font-size:1.3rem;letter-spacing:.04em;
+  background:linear-gradient(180deg,#fb923c,var(--coral));color:#3f1108;border:none;padding:16px 38px;
+  border-radius:14px;cursor:pointer;box-shadow:0 6px 0 #9f1239;transition:.15s;animation:bigPulse 1.6s ease-in-out infinite}
+.btn-big:hover{transform:translateY(-3px) scale(1.03)}
+.btn-big:active{transform:translateY(3px);box-shadow:0 1px 0 #9f1239}
+@keyframes bigPulse{50%{box-shadow:0 6px 0 #9f1239,0 0 30px rgba(251,113,133,.55)}}
+.res-title{font-family:'Baloo 2';font-weight:800;font-size:clamp(1.6rem,5vw,2.5rem);line-height:1.1;text-shadow:4px 4px 0 var(--hard);margin-bottom:6px}
+.res-title.win{color:var(--sun)} .res-title.mid{color:var(--sea)} .res-title.lose{color:var(--no)}
+.res-rank{font-family:'Baloo 2';font-weight:800;font-size:1.2rem;color:var(--sea);margin-bottom:12px}
+.res-stats{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+.stat{background:#071e33;border:2px solid var(--line);border-radius:12px;padding:9px 16px}
+.stat .lab{font-size:.58rem;font-weight:900;letter-spacing:.14em;color:var(--mut)}
+.stat .val{font-family:'Baloo 2';font-size:1.5rem;line-height:1.1}
+.res-quote{font-size:.9rem;font-weight:700;color:#c6ddf2;background:#071e33;border-radius:10px;padding:10px 14px;margin-bottom:20px;line-height:1.5}
+.ship-art{margin:6px auto 16px;max-width:340px}
+#confettiBox{position:absolute;inset:0;pointer-events:none;overflow:hidden;border-radius:18px}
+#confettiBox i{position:absolute;top:-26px;width:10px;height:16px;border-radius:2px;animation:fall linear forwards}
+@keyframes fall{from{transform:translateY(-4vh) rotate(0)}to{transform:translateY(112vh) rotate(var(--r,600deg))}}
+
+@media (max-width:720px){
+  .options{grid-template-columns:1fr}
+  .brand p{display:none}
+  .chip .lab{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+}
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <header class="hud">
+    <div class="brand">
+      <div class="brand-badge">🎣</div>
+      <div>
+        <h1>MANCING MANIA <em>BIOTIK &amp; ABIOTIK</em></h1>
+        <p>MAKHLUK HIDUP &amp; LINGKUNGANNYA • SMK KELAS X</p>
+      </div>
+    </div>
+    <div class="chips">
+      <div class="chip time" id="chipTime"><span class="ic">⏱</span><span><span class="lab">WAKTU</span><span class="val" id="timeVal">15:00</span></span></div>
+      <div class="chip fish"><span class="ic">🐟</span><span><span class="lab">IKAN</span><span class="val" id="fishVal">0</span></span></div>
+      <div class="chip"><span class="ic">📋</span><span><span class="lab">SOAL</span><span class="val" id="qVal">1/25</span></span></div>
+      <div class="chip"><span class="ic">⛵</span><span><span class="lab">LAMBUNG</span><div class="hull"><div id="hullFill"></div></div></span></div>
+      <button class="icon-btn" id="soundBtn" title="Suara nyala/mati">🔊</button>
+    </div>
+  </header>
+  <div class="time-bar"><div id="timeBar"></div></div>
+
+  <section class="sea-wrap" id="seaWrap">
+    <svg id="sea" viewBox="0 0 1200 640" role="img" aria-label="Pemandangan laut dengan kapal nelayan">
+      <defs>
+        <linearGradient id="skyG" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#58b9f5"/><stop offset="1" stop-color="#cdeffd"/>
+        </linearGradient>
+        <linearGradient id="seaG" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#23a7e0"/><stop offset=".45" stop-color="#0f6aa3"/><stop offset="1" stop-color="#0a3a63"/>
+        </linearGradient>
+      </defs>
+
+      <rect width="1200" height="332" fill="url(#skyG)"/>
+
+      <!-- matahari -->
+      <circle cx="120" cy="92" r="58" fill="#ffe066" opacity=".3"/>
+      <g class="sun-rays" stroke="#ffd93b" stroke-width="6" stroke-linecap="round">
+        <line x1="120" y1="30" x2="120" y2="14"/><line x1="120" y1="154" x2="120" y2="170"/>
+        <line x1="58" y1="92" x2="42" y2="92"/><line x1="182" y1="92" x2="198" y2="92"/>
+        <line x1="76" y1="48" x2="65" y2="37"/><line x1="164" y1="136" x2="175" y2="147"/>
+        <line x1="164" y1="48" x2="175" y2="37"/><line x1="76" y1="136" x2="65" y2="147"/>
+      </g>
+      <circle cx="120" cy="92" r="38" fill="#ffd93b"/>
+      <circle cx="112" cy="86" r="30" fill="#ffe873" opacity=".7"/>
+
+      <!-- awan & burung -->
+      <g class="cloudA" fill="#ffffff" opacity=".92">
+        <ellipse cx="90" cy="88" rx="52" ry="22"/><ellipse cx="140" cy="76" rx="40" ry="20"/><ellipse cx="180" cy="92" rx="44" ry="18"/>
+      </g>
+      <g class="cloudB" fill="#ffffff" opacity=".8">
+        <ellipse cx="60" cy="160" rx="42" ry="17"/><ellipse cx="105" cy="150" rx="34" ry="16"/><ellipse cx="140" cy="163" rx="36" ry="14"/>
+      </g>
+      <g class="birds" stroke="#334155" stroke-width="2.6" fill="none" stroke-linecap="round">
+        <path d="M300 110 q7 -8 14 0 q7 -8 14 0"/><path d="M345 96 q6 -7 12 0 q6 -7 12 0"/><path d="M318 130 q5 -6 11 0 q5 -6 11 0"/>
+      </g>
+
+      <!-- air -->
+      <rect y="330" width="1200" height="310" fill="url(#seaG)"/>
+      <polygon class="ray" points="290,332 350,332 470,640 340,640" fill="#ffffff"/>
+      <polygon class="ray" points="700,332 760,332 900,640 780,640" fill="#ffffff" style="animation-delay:-3s"/>
+
+      <!-- gelombang belakang -->
+      <path class="w1" fill="#7fd4f7" opacity=".55" d="M-120 328 q60 -14 120 0 t120 0 t120 0 t120 0 t120 0 t120 0 t120 0 t120 0 t120 0 t120 0 t120 0 t120 0 V380 H-120 Z"/>
+
+      <!-- dasar laut -->
+      <path d="M0 604 Q200 590 420 602 T860 600 T1200 604 L1200 640 H0 Z" fill="#caa45f"/>
+      <circle cx="240" cy="616" r="4" fill="#a5854a"/><circle cx="520" cy="622" r="5" fill="#a5854a"/><circle cx="900" cy="618" r="4" fill="#a5854a"/>
+      <ellipse cx="130" cy="606" rx="34" ry="16" fill="#5f6f81"/><ellipse cx="170" cy="612" rx="22" ry="12" fill="#4c5b6b"/>
+      <ellipse cx="1050" cy="608" rx="38" ry="17" fill="#5f6f81"/>
+      <!-- koral -->
+      <g>
+        <circle cx="980" cy="596" r="14" fill="#fb7185"/><circle cx="1002" cy="588" r="12" fill="#f97316"/><circle cx="996" cy="604" r="11" fill="#fb7185"/>
+        <path d="M340 606 q-6 -34 6 -46 M352 606 q10 -26 2 -44 M330 606 q-14 -22 -6 -40" stroke="#f97316" stroke-width="7" fill="none" stroke-linecap="round"/>
+      </g>
+      <!-- rumput laut -->
+      <path class="weed" d="M150 612 q-12 -30 4 -52 q14 -20 2 -44" stroke="#16a34a" stroke-width="9" fill="none" stroke-linecap="round"/>
+      <path class="weed" style="animation-delay:-1.4s" d="M182 614 q10 -26 -2 -48 q-12 -22 0 -40" stroke="#15803d" stroke-width="8" fill="none" stroke-linecap="round"/>
+      <path class="weed" style="animation-delay:-2.2s" d="M1120 610 q-10 -28 4 -50 q12 -22 2 -38" stroke="#16a34a" stroke-width="8" fill="none" stroke-linecap="round"/>
+      <path d="M480 618 l7 -14 7 14 -7 4 z M494 616 l6 -12 6 12 -6 4 z" fill="#fb923c"/>
+
+      <g id="swimmers"></g>
+      <g id="bubbles"></g>
+
+      <!-- KAPAL BESAR (hadiah, tersembunyi) -->
+      <g id="bigShip" opacity="0" transform="translate(0,40)">
+        <ellipse cx="620" cy="352" rx="262" ry="14" fill="#063a5e" opacity=".4"/>
+        <path d="M360 306 H880 L848 372 Q620 396 392 372 Z" fill="#1d4ed8"/>
+        <path d="M372 352 H868 L848 372 Q620 396 392 372 Z" fill="#b91c1c"/>
+        <rect x="360" y="298" width="520" height="12" rx="6" fill="#e2e8f0"/>
+        <rect x="420" y="268" width="64" height="32" rx="3" fill="#f97316"/>
+        <rect x="492" y="268" width="64" height="32" rx="3" fill="#22d3ee"/>
+        <rect x="564" y="268" width="64" height="32" rx="3" fill="#facc15"/>
+        <rect x="492" y="234" width="64" height="32" rx="3" fill="#34d399"/>
+        <rect x="564" y="234" width="64" height="32" rx="3" fill="#fb7185"/>
+        <rect x="700" y="222" width="96" height="78" rx="8" fill="#f8fafc" stroke="#9fb3c8" stroke-width="2"/>
+        <rect x="712" y="236" width="20" height="14" rx="3" fill="#8ed1f7"/><rect x="740" y="236" width="20" height="14" rx="3" fill="#8ed1f7"/><rect x="768" y="236" width="20" height="14" rx="3" fill="#8ed1f7"/>
+        <rect x="692" y="212" width="112" height="14" rx="7" fill="#0ea5e9"/>
+        <rect x="816" y="238" width="30" height="60" rx="6" fill="#ef4444"/><rect x="816" y="238" width="30" height="14" rx="6" fill="#1f2937"/>
+        <circle class="puff" cx="831" cy="230" r="8" fill="#e2e8f0" opacity=".7"/>
+        <circle class="puff" style="animation-delay:-1.2s" cx="831" cy="230" r="6" fill="#f1f5f9" opacity=".7"/>
+        <circle class="puff" style="animation-delay:-2.3s" cx="831" cy="230" r="7" fill="#e2e8f0" opacity=".7"/>
+        <rect x="666" y="168" width="5" height="54" fill="#64748b"/>
+        <path d="M671 172 L703 181 L671 190 Z" fill="#fbbf24"/>
+      </g>
+
+      <!-- KAPAL NELAYAN -->
+      <g id="boatBob">
+        <g id="boatDamage">
+          <g id="boatArt">
+            <ellipse cx="600" cy="346" rx="152" ry="10" fill="#063a5e" opacity=".35"/>
+            <path d="M458 314 H742 L708 366 Q600 386 492 366 Z" fill="#b0722f"/>
+            <path d="M472 352 H728 L708 366 Q600 386 492 366 Z" fill="#8a5420"/>
+            <rect x="456" y="306" width="288" height="10" rx="5" fill="#e9b872"/>
+            <circle cx="502" cy="332" r="11" fill="none" stroke="#ef4444" stroke-width="6" stroke-dasharray="8 6"/>
+            <rect x="537" y="258" width="98" height="50" rx="8" fill="#f8fafc" stroke="#9fb3c8" stroke-width="2"/>
+            <rect x="529" y="248" width="114" height="15" rx="7" fill="#ef4444"/>
+            <rect x="551" y="272" width="26" height="20" rx="4" fill="#8ed1f7" stroke="#9fb3c8" stroke-width="2"/>
+            <rect x="591" y="272" width="26" height="20" rx="4" fill="#8ed1f7" stroke="#9fb3c8" stroke-width="2"/>
+            <rect x="556" y="192" width="6" height="58" fill="#7c4a1a"/>
+            <path d="M562 196 L606 206 L562 216 Z" fill="#fb7185"/>
+            <path d="M600 296 L646 296 L640 316 L606 316 Z" fill="#7c4a1a" stroke="#5d3613" stroke-width="2"/>
+            <ellipse cx="623" cy="296" rx="23" ry="5" fill="#5d3613"/>
+            <g id="deckFish"></g>
+            <g id="fisherman">
+              <path d="M676 308 L666 292" stroke="#1e3a8a" stroke-width="7" stroke-linecap="round"/>
+              <path d="M670 294 L668 272" stroke="#f97316" stroke-width="13" stroke-linecap="round"/>
+              <circle cx="666" cy="256" r="10.5" fill="#f6c99f"/>
+              <path d="M654 252 a12 12 0 0 1 24 0 z" fill="#fbbf24"/>
+              <rect x="649" y="250" width="36" height="4.5" rx="2" fill="#f59e0b"/>
+              <circle cx="671.5" cy="257" r="1.7" fill="#1f2937"/>
+              <path d="M668 276 L684 266" stroke="#f97316" stroke-width="7" stroke-linecap="round"/>
+              <circle cx="684" cy="266" r="4" fill="#f6c99f"/>
+            </g>
+            <path d="M682 268 Q742 238 794 240" stroke="#7c4a1a" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+          </g>
+        </g>
+        <g id="reel">
+          <line id="reelLine" x1="794" y1="242" x2="794" y2="472" stroke="#e8f1f8" stroke-width="2" opacity=".9"/>
+          <circle class="bobberF" cx="794" cy="330" r="6" fill="#ef4444"/><rect x="791" y="324" width="6" height="5" fill="#f8fafc"/>
+          <g id="hookG">
+            <path d="M794 470 q0 12 -9 12 q-9 0 -9 -10" stroke="#cbd5e1" stroke-width="3" fill="none" stroke-linecap="round"/>
+            <g id="hookFish"></g>
+          </g>
+        </g>
+      </g>
+
+      <!-- gelombang depan -->
+      <path class="w2" fill="#cfeeff" opacity=".5" d="M-120 336 q60 -12 120 0 t120 0 t120 0 t120 0 t120 0 t120 0 t120 0 t120 0 t120 0 t120 0 t120 0 t120 0 V390 H-120 Z"/>
+      <path class="w3" fill="#ffffff" opacity=".35" d="M-120 342 q60 -10 120 0 t120 0 t120 0 t120 0 t120 0 t120 0 t120 0 t120 0 t120 0 t120 0 t120 0 t120 0 V396 H-120 Z"/>
+
+      <g id="fx"></g>
+      <rect id="darkSea" width="1200" height="640" fill="#02101f" opacity="0" pointer-events="none"/>
+    </svg>
+    <div class="scene-legend">
+      <span class="lg bio">🐠 BIOTIK = semua makhluk hidup</span>
+      <span class="lg abio">💧☀️ ABIOTIK = komponen tak hidup</span>
+    </div>
+    <div class="flash" id="flash"></div>
+  </section>
+
+  <section class="qcard" id="qcard">
+    <div class="q-head">
+      <span class="q-badge" id="qBadge">SOAL 1</span>
+      <span class="q-cat c-konsep" id="qCat">KONSEP</span>
+    </div>
+    <h2 class="q-text" id="qText">Siapkan kailmu, nelayan!</h2>
+    <div class="options" id="optsWrap"></div>
+    <div class="feedback hidden" id="feedback">
+      <div class="fb-banner" id="fbBanner"></div>
+      <p class="fb-info" id="fbInfo"></p>
+      <button class="btn-next" id="btnNext">LANJUT ➜</button>
+    </div>
+  </section>
+
+  <footer>🎣 MEDIA PEMBELAJARAN MAKHLUK HIDUP &amp; LINGKUNGANNYA — SMK KELAS X • 25 SOAL • WAKTU 15 MENIT</footer>
+</div>
+
+<!-- OVERLAY MULAI -->
+<div class="overlay" id="ovStart">
+  <div class="ov-card">
+    <div class="ov-kick">⚓ PELABUHAN SMK • KAPAL SIAP BERANGKAT</div>
+    <h2 class="ov-title">MANCING MANIA<br><span>BIOTIK &amp; ABIOTIK</span></h2>
+    <p class="ov-sub">Berlayarlah dan jawab 25 pertanyaan tentang komponen biotik &amp; abiotik.<br>Setiap jawaban menentukan nasib kapalmu di laut!</p>
+    <ul class="rules">
+      <li>✅ Jawaban <b>BENAR</b> → kamu mendapat seekor ikan 🐟</li>
+      <li>❌ Jawaban <b>SALAH</b> → kapal <b>berguncang</b> &amp; lambung melemah</li>
+      <li>🌊 Salah <b>19 soal (¾ bagian)</b> → kapal <b>TENGGELAM!</b></li>
+      <li>⏱ Waktu melaut total <b>15 menit</b> untuk semua soal</li>
+      <li>🚢 Benar <b>SEMUA (25/25)</b> → hadiah utama <b>KAPAL BESAR!</b></li>
+    </ul>
+    <button class="btn-big" id="btnStart">⚓ MULAI MELAUT!</button>
+  </div>
+</div>
+
+<!-- OVERLAY HASIL -->
+<div class="overlay hidden" id="ovResult">
+  <div class="ov-card" id="resCard">
+    <div id="confettiBox"></div>
+    <div class="ov-kick" id="resKick">🏁 PERJALANAN SELESAI</div>
+    <h2 class="res-title" id="resTitle">HASIL</h2>
+    <div class="ship-art hidden" id="resShip">
+      <svg viewBox="0 0 340 150" width="100%">
+        <path d="M20 96 H320 L300 132 Q170 146 40 132 Z" fill="#1d4ed8"/>
+        <path d="M28 118 H312 L300 132 Q170 146 40 132 Z" fill="#b91c1c"/>
+        <rect x="20" y="90" width="300" height="9" rx="4" fill="#e2e8f0"/>
+        <rect x="60" y="68" width="42" height="22" rx="3" fill="#f97316"/><rect x="106" y="68" width="42" height="22" rx="3" fill="#22d3ee"/>
+        <rect x="152" y="68" width="42" height="22" rx="3" fill="#facc15"/><rect x="106" y="44" width="42" height="22" rx="3" fill="#34d399"/>
+        <rect x="228" y="38" width="56" height="52" rx="6" fill="#f8fafc" stroke="#9fb3c8" stroke-width="2"/>
+        <rect x="236" y="48" width="14" height="10" rx="2" fill="#8ed1f7"/><rect x="256" y="48" width="14" height="10" rx="2" fill="#8ed1f7"/>
+        <rect x="296" y="52" width="18" height="38" rx="4" fill="#ef4444"/><rect x="296" y="52" width="18" height="9" rx="4" fill="#1f2937"/>
+        <rect x="210" y="10" width="4" height="30" fill="#64748b"/><path d="M214 12 L236 19 L214 26 Z" fill="#fbbf24"/>
+        <text x="170" y="20" text-anchor="middle" font-size="26">🎉🚢🎉</text>
+      </svg>
+    </div>
+    <p class="res-rank" id="resRank"></p>
+    <div class="res-stats" id="resStats"></div>
+    <p class="res-quote" id="resQuote"></p>
+    <button class="btn-big" id="btnAgain">🔁 MELAUT LAGI!</button>
+  </div>
+</div>
+
+<script>
+/* ================= BANK SOAL (25) ================= */
+const BANK=[
+{cat:'KONSEP',q:'Semua komponen tak hidup yang terdapat dalam suatu ekosistem disebut…',opts:['Komponen biotik','Komponen abiotik','Produsen','Dekomposer'],a:1,info:'Komponen abiotik adalah bagian tak hidup ekosistem, misalnya air, cahaya matahari, tanah, suhu, dan udara.'},
+{cat:'KONSEP',q:'Berikut ini yang termasuk komponen biotik adalah…',opts:['Sinar matahari','Air laut','Cacing tanah','Batu'],a:2,info:'Cacing tanah adalah makhluk hidup sehingga termasuk komponen biotik. Sinar matahari, air, dan batu adalah komponen abiotik.'},
+{cat:'ABIOTIK',q:'Komponen abiotik yang menjadi sumber energi utama bagi tumbuhan hijau untuk berfotosintesis adalah…',opts:['Air','Tanah','Cahaya matahari','Angin'],a:2,info:'Tanpa cahaya matahari, tumbuhan hijau tidak dapat berfotosintesis untuk membuat makanannya sendiri.'},
+{cat:'BIOTIK',q:'Dalam ekosistem, tumbuhan hijau berperan sebagai…',opts:['Konsumen','Produsen','Dekomposer','Predator'],a:1,info:'Tumbuhan hijau disebut produsen karena mampu membuat makanan sendiri melalui fotosintesis.'},
+{cat:'BIOTIK',q:'Organisme yang menguraikan sisa-sisa makhluk hidup yang telah mati menjadi zat sederhana disebut…',opts:['Produsen','Konsumen','Pengurai (dekomposer)','Herbivora'],a:2,info:'Bakteri dan jamur adalah contoh pengurai yang mengembalikan zat hara ke lingkungan.'},
+{cat:'BIOTIK',q:'Contoh produsen pada ekosistem laut adalah…',opts:['Fitoplankton','Zooplankton','Ikan tuna','Bintang laut'],a:0,info:'Fitoplankton adalah tumbuhan mikroskopis laut yang berfotosintesis dan menjadi dasar rantai makanan laut.'},
+{cat:'BIOTIK',q:'Zooplankton dalam ekosistem laut berperan sebagai…',opts:['Produsen','Konsumen','Pengurai','Tumbuhan air'],a:1,info:'Zooplankton adalah plankton hewani yang memakan fitoplankton, sehingga berperan sebagai konsumen.'},
+{cat:'KONSEP',q:'Kumpulan individu sejenis yang hidup pada tempat dan waktu tertentu disebut…',opts:['Individu','Populasi','Komunitas','Ekosistem'],a:1,info:'Contoh populasi: sekumpulan ikan bandeng di dalam satu kolam budidaya.'},
+{cat:'KONSEP',q:'Seluruh populasi makhluk hidup yang hidup bersama di suatu kawasan disebut…',opts:['Individu','Populasi','Komunitas','Biosfer'],a:2,info:'Komunitas terdiri dari berbagai populasi, misalnya populasi ikan, rumput laut, dan kepiting di terumbu karang.'},
+{cat:'KONSEP',q:'Hubungan timbal balik antara komponen biotik dan abiotik dalam suatu lingkungan membentuk…',opts:['Habitat','Ekosistem','Populasi','Individu'],a:1,info:'Ekosistem adalah kesatuan interaksi antara makhluk hidup dengan lingkungan tak hidupnya.'},
+{cat:'INTERAKSI',q:'Lebah mengambil nektar bunga sekaligus membantu penyerbukan. Hubungan ini disebut…',opts:['Parasitisme','Komensalisme','Mutualisme','Predasi'],a:2,info:'Mutualisme menguntungkan kedua pihak: lebah mendapat nektar, bunga terbantu penyerbukannya.'},
+{cat:'INTERAKSI',q:'Ikan badut yang hidup di antara tentakel anemon laut adalah contoh simbiosis…',opts:['Mutualisme','Parasitisme','Komensalisme','Kompetisi'],a:0,info:'Ikan badut mendapat perlindungan, anemon mendapat sisa makanan dan dibersihkan — sama-sama untung!'},
+{cat:'INTERAKSI',q:'Persaingan antar makhluk hidup untuk memperebutkan makanan atau wilayah yang sama disebut…',opts:['Predasi','Simbiosis','Kompetisi','Dekomposisi'],a:2,info:'Kompetisi terjadi ketika beberapa organisme membutuhkan sumber daya yang sama dan terbatas.'},
+{cat:'INTERAKSI',q:'Hubungan makan dan dimakan antara makhluk hidup disebut…',opts:['Predasi','Simbiosis','Adaptasi','Dekomposisi'],a:0,info:'Predasi adalah hubungan pemangsa dan mangsa, contohnya ikan besar memakan ikan kecil.'},
+{cat:'ABIOTIK',q:'Faktor abiotik yang menunjukkan tingkat keasaman suatu perairan adalah…',opts:['Suhu','pH','Salinitas','Kecerahan'],a:1,info:'pH ideal untuk budidaya ikan umumnya berkisar 6,5–8,5.'},
+{cat:'ABIOTIK',q:'Kadar garam yang terlarut dalam air laut disebut…',opts:['pH','Oksigen terlarut','Salinitas','Kekeruhan'],a:2,info:'Salinitas air laut rata-rata sekitar 35‰ (per mil).'},
+{cat:'ABIOTIK',q:'Oksigen yang terlarut di dalam air kolam termasuk komponen…',opts:['Biotik','Abiotik','Produsen','Konsumen'],a:1,info:'Oksigen terlarut (DO) adalah zat tak hidup yang sangat dibutuhkan ikan untuk bernapas.'},
+{cat:'RANTAI MAKANAN',q:'Tingkatan trofik pertama dalam rantai makanan selalu ditempati oleh…',opts:['Produsen','Konsumen I','Konsumen II','Pengurai'],a:0,info:'Rantai makanan selalu dimulai dari produsen yang mampu membuat makanan sendiri.'},
+{cat:'RANTAI MAKANAN',q:'Hewan pemakan tumbuhan (konsumen tingkat I) disebut…',opts:['Karnivora','Herbivora','Omnivora','Detritivor'],a:1,info:'Herbivora memakan tumbuhan, contohnya ikan tombro dan kambing.'},
+{cat:'RANTAI MAKANAN',q:'Perhatikan rantai makanan: fitoplankton → zooplankton → ikan kecil → ikan besar. Konsumen puncaknya adalah…',opts:['Fitoplankton','Zooplankton','Ikan kecil','Ikan besar'],a:3,info:'Konsumen puncak berada di ujung rantai makanan dan tidak dimangsa organisme lain.'},
+{cat:'ABIOTIK',q:'Jika suhu air kolam terlalu tinggi, dampak yang terjadi adalah…',opts:['Oksigen terlarut menurun','Ikan tumbuh lebih cepat','Air semakin jernih','Plankton bertambah banyak'],a:0,info:'Air yang hangat menyimpan lebih sedikit oksigen terlarut sehingga ikan bisa kekurangan oksigen.'},
+{cat:'BIOTIK',q:'Hewan pemakan sisa-sisa makhluk hidup yang telah mati (detritus), seperti cacing tanah, disebut…',opts:['Herbivora','Karnivora','Detritivor','Produsen'],a:2,info:'Detritivor menghancurkan detritus sebelum diuraikan lebih lanjut oleh dekomposer.'},
+{cat:'ABIOTIK',q:'Berikut ini yang BUKAN komponen abiotik adalah…',opts:['Air','Cahaya matahari','Jamur','Udara'],a:2,info:'Jamur adalah makhluk hidup (komponen biotik) yang berperan sebagai pengurai.'},
+{cat:'INTERAKSI',q:'Benalu yang hidup menempel dan menyerap makanan dari pohon mangga merupakan contoh…',opts:['Mutualisme','Komensalisme','Parasitisme','Predasi'],a:2,info:'Parasitisme: satu pihak diuntungkan (benalu), pihak lain dirugikan (pohon mangga).'},
+{cat:'KONSEP',q:'Tempat hidup alami suatu makhluk hidup disebut…',opts:['Habitat','Ekosistem','Bioma','Relung'],a:0,info:'Habitat adalah "alamat" organisme, misalnya habitat ikan badut di terumbu karang.'}
+];
+
+/* ================= UTIL & SUARA ================= */
+const $=id=>document.getElementById(id);
+const SVGNS='http://www.w3.org/2000/svg';
+const TOTAL=25, SINK_AT=19, TIME_LIMIT=15*60;
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=(Math.random()*(i+1))|0;[a[i],a=j=0,0][i]=[a[j],a[j]=a[i],a[i]][0];[a[i],a[j]]=[a[j],a[i]];}return a;}
+function shuffleArr(a){for(let i=a.length-1;i>0;i--){const j=(Math.random()*(i+1))|0;[a[i],a[j]]=[a[j],a[i]];}return a;}
+function easeIO(p){return p<.5?2*p*p:1-Math.pow(-2*p+2,2)/2;}
+function tween(dur,fn,done){const t0=performance.now();(function step(t){const p=Math.min(1,(t-t0)/dur);fn(easeIO(p));if(p<1)requestAnimationFrame(step);else done&&done();})(performance.now());}
+
+const SFX=(()=>{let ctx,on=true;
+  const ac=()=>ctx=ctx||new (window.AudioContext||window.webkitAudioContext)();
+  function tone(f,dur,type='triangle',vol=.2,slide){if(!on)return;try{const c=ac(),t=c.currentTime,o=c.createOscillator(),g=c.createGain();
+    o.type=type;o.frequency.setValueAtTime(f,t);if(slide)o.frequency.exponentialRampToValueAtTime(slide,t+dur);
+    g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(vol,t+.02);g.gain.exponentialRampToValueAtTime(.0001,t+dur);
+    o.connect(g).connect(c.destination);o.start(t);o.stop(t+dur+.05);}catch(e){}}
+  function noise(dur,freq,vol){if(!on)return;try{const c=ac(),len=c.sampleRate*dur,buf=c.createBuffer(1,len,c.sampleRate),d=buf.getChannelData(0);
+    for(let i=0;i<len;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/len,2);
+    const s=c.createBufferSource();s.buffer=buf;const f=c.createBiquadFilter();f.type='lowpass';f.frequency.value=freq;
+    const g=c.createGain();g.gain.value=vol;s.connect(f);f.connect(g);g.connect(c.destination);s.start();}catch(e){}}
+  return{
+    toggle(){on=!on;return on;},
+    click(){tone(620,.06,'square',.08);},
+    splash(){noise(.35,900,.35);},
+    catch(){tone(660,.09,'triangle',.22);setTimeout(()=>tone(880,.12,'triangle',.22),90);setTimeout(()=>noise(.25,1000,.25),40);},
+    wrong(){tone(95,.45,'sawtooth',.24,55);noise(.4,600,.3);},
+    tick(){tone(1050,.05,'square',.07);},
+    horn(){tone(130,.7,'sawtooth',.2);tone(164,.7,'sawtooth',.15);},
+    sink(){tone(280,1.8,'sawtooth',.2,50);setTimeout(()=>noise(.8,500,.3),300);},
+    fanfare(){[523,659,784,1047,784,1047,1319].forEach((f,i)=>setTimeout(()=>tone(f,.22,'triangle',.22),i*140));}
+  };})();
+
+/* ================= DEKORASI LAUT ================= */
+(function(){
+  // ikan hias
+  const cols=['#fb923c','#facc15','#34d399','#f472b6','#a5b4fc','#f87171'];
+  const fishSVG=(col)=>`<g class="fishbob"><path d="M30 0 L52 -14 L52 14 Z" fill="${col}" opacity=".9"/><ellipse cx="12" cy="0" rx="28" ry="15" fill="${col}"/><path d="M8 -14 q10 -10 20 0 z" fill="${col}" opacity=".8"/><circle cx="-2" cy="-4" r="3" fill="#0b2540"/><circle cx="-2.8" cy="-4.8" r="1" fill="#fff"/><path d="M-8 5 q5 3 9 1" stroke="#0b254088" stroke-width="2" fill="none"/></g>`;
+  let sw='';
+  for(let i=0;i<6;i++){
+    const rev=i%2===1, y=380+Math.random()*180, s=(.7+Math.random()*.6).toFixed(2);
+    const d=(14+Math.random()*14).toFixed(1), dl=(-Math.random()*20).toFixed(1);
+    const startX=rev?-90:1260;
+    sw+=`<g class="swimmer${rev?' rev':''}" style="--d:${d}s;--dl:${dl}s"><g transform="translate(${startX},${y.toFixed(0)}) scale(${s}) ${rev?'scale(-1,1)':''}">${fishSVG(cols[i%cols.length])}</g></g>`;
+  }
+  $('swimmers').innerHTML=sw;
+  // gelembung
+  let bu='';
+  for(let i=0;i<13;i++){
+    const x=60+Math.random()*1080,y=560+Math.random()*60,h=-(y-348);
+    bu+=`<circle class="bubble" style="--d:${(6+Math.random()*6).toFixed(1)}s;--dl:${(-Math.random()*8).toFixed(1)}s;--h:${h.toFixed(0)}px" cx="${x.toFixed(0)}" cy="${y.toFixed(0)}" r="${(2.5+Math.random()*4.5).toFixed(1)}" fill="#bde9ff" opacity=".7"/>`;
+  }
+  $('bubbles').innerHTML=bu;
+})();
+
+/* ================= STATE ================= */
+let deck=[],cur=0,okCount=0,wrongCount=0,answered=false,gameOver=false,sinking=false;
+let timeLeft=TIME_LIMIT,timerInt=null;
+const pull={};
+
+function buildDeck(){
+  deck=shuffleArr(BANK.slice()).map(item=>{
+    const idx=item.opts.map((o,i)=>({o,i}));shuffleArr(idx);
+    return{cat:item.cat,q:item.q,info:item.info,opts:idx.map(x=>x.o),a:idx.findIndex(x=>x.i===item.a)};
+  });
+}
+
+/* ================= HUD ================= */
+function updateHUD(){
+  $('fishVal').textContent=okCount;
+  $('qVal').textContent=Math.min(cur+1,TOTAL)+'/'+TOTAL;
+  const h=(SINK_AT-wrongCount)/SINK_AT*100, fill=$('hullFill');
+  fill.style.width=h+'%';
+  fill.className=h>60?'':h>30?'mid':'low';
+  $('timeBar').style.width=(timeLeft/TIME_LIMIT*100)+'%';
+  $('timeBar').classList.toggle('low',timeLeft<=90);
+}
+function fmt(s){const m=Math.floor(s/60),ss=s%60;return m+':'+String(ss).padStart(2,'0');}
+function startClock(){
+  stopClock();
+  timerInt=setInterval(()=>{
+    timeLeft--;
+    $('timeVal').textContent=fmt(timeLeft);
+    $('chipTime').classList.toggle('danger',timeLeft<=60);
+    if(timeLeft<=10&&timeLeft>0)SFX.tick();
+    updateHUD();
+    if(timeLeft<=0){stopClock();timeUp();}
+  },1000);
+}
+function stopClock(){clearInterval(timerInt);timerInt=null;}
+
+/* ================= EFEK ARENA ================= */
+function floatFX(txt,color){
+  const t=document.createElementNS(SVGNS,'text');
+  t.textContent=txt;t.setAttribute('x',600);t.setAttribute('y',200);
+  t.setAttribute('text-anchor','middle');t.setAttribute('class','floatfx');t.style.fill=color;
+  $('fx').appendChild(t);
+  t.animate([{transform:'translateY(0) scale(.7)',opacity:0},{transform:'translateY(-16px) scale(1.15)',opacity:1,offset:.25},{transform:'translateY(-56px) scale(1)',opacity:0}],{duration:1100,easing:'ease-out'}).onfinish=()=>t.remove();
+}
+function splashFX(x,y,n=9){
+  for(let i=0;i<n;i++){
+    const c=document.createElementNS(SVGNS,'circle');
+    c.setAttribute('r',2.5+Math.random()*3.5);c.setAttribute('cx',x+(Math.random()*24-12));c.setAttribute('cy',y);c.setAttribute('fill','#e6f7ff');
+    $('fx').appendChild(c);
+    c.animate([{transform:'translate(0,0)',opacity:.95},{transform:`translate(${(Math.random()*60-30).toFixed(0)}px,${(-24-Math.random()*30).toFixed(0)}px)`,opacity:0}],{duration:520+Math.random()*260,easing:'ease-out'}).onfinish=()=>c.remove();
+  }
+}
+function flashFX(){
+  $('flash').animate([{opacity:0},{opacity:1},{opacity:0}],{duration:380,easing:'ease-out'});
+}
+function shakeBoat(){
+  $('boatArt').animate([
+    {transform:'rotate(0deg)'},{transform:'rotate(-7deg) translateY(4px)'},{transform:'rotate(6deg)'},
+    {transform:'rotate(-4deg)'},{transform:'rotate(2deg)'},{transform:'rotate(0deg)'}
+  ],{duration:750,easing:'ease-in-out'});
+  splashFX(470,332,7);splashFX(730,332,7);
+  const w=$('seaWrap');w.classList.remove('shake');void w.offsetWidth;w.classList.add('shake');
+}
+function applyDamage(){
+  $('boatDamage').style.transform=`translate(0px,${wrongCount*1.6}px) rotate(${wrongCount*.55}deg)`;
+  $('boatDamage').style.transformOrigin='600px 340px';
+  $('boatDamage').style.transformBox='view-box';
+}
+function makeSmallFish(col){
+  return `<g><path d="M14 0 L24 -7 L24 7 Z" fill="${col}" opacity=".9"/><ellipse cx="6" cy="0" rx="13" ry="7" fill="${col}"/><circle cx="0" cy="-2" r="1.6" fill="#0b2540"/></g>`;
+}
+function addFishToDeck(){
+  const n=$('deckFish').children.length;
+  if(n>=12)return;
+  const g=document.createElementNS(SVGNS,'g');
+  const x=606+Math.random()*32,y=284+Math.random()*10,r=(Math.random()*30-15).toFixed(0);
+  g.innerHTML=makeSmallFish(['#fb923c','#facc15','#34d399','#f472b6'][n%4]);
+  g.setAttribute('transform',`translate(${x.toFixed(0)},${y.toFixed(0)}) rotate(${r}) scale(.85)`);
+  $('deckFish').appendChild(g);
+  g.animate([{transform:g.getAttribute('transform')+' scale(0)',opacity:0},{transform:g.getAttribute('transform'),opacity:1}],{duration:350,easing:'ease-out'});
+}
+function catchSequence(){
+  // ikan menempel di kail
+  const hf=$('hookFish');
+  hf.innerHTML=`<g transform="translate(782,474) rotate(-18)">${makeSmallFish('#fb923c')}</g>`;
+  // gulung tali
+  tween(850,p=>{
+    const dy=140*p;
+    $('reelLine').setAttribute('y2',472-dy);
+    $('hookG').setAttribute('transform',`translate(0,${-dy})`);
+  },()=>{
+    splashFX(794,332,8);SFX.splash();
+    hf.innerHTML='';
+    $('reelLine').setAttribute('y2',472);
+    $('hookG').setAttribute('transform','translate(0,0)');
+    // ikan melompat ke ember
+    const fly=document.createElementNS(SVGNS,'g');
+    fly.innerHTML=makeSmallFish('#fb923c');
+    fly.setAttribute('transform','translate(794,330) scale(1.25)');
+    $('fx').appendChild(fly);
+    fly.animate([
+      {transform:'translate(794px,330px) scale(1.25) rotate(0deg)'},
+      {transform:'translate(710px,258px) scale(1.25) rotate(-40deg)',offset:.5},
+      {transform:'translate(624px,290px) scale(1) rotate(-10deg)'}
+    ],{duration:720,easing:'ease-in'}).onfinish=()=>{
+      fly.remove();addFishToDeck();
+      $('fishVal').animate([{transform:'scale(1)'},{transform:'scale(1.6)'},{transform:'scale(1)'}],{duration:400});
+    };
+  });
+}
+function sinkSequence(){
+  sinking=true;
+  SFX.sink();
+  $('boatDamage').animate([
+    {transform:'translate(0px,0px) rotate(0deg)',opacity:1},
+    {transform:'translate(40px,60px) rotate(8deg)',opacity:1,offset:.3},
+    {transform:'translate(90px,300px) rotate(30deg)',opacity:.25}
+  ],{duration:3200,easing:'ease-in',fill:'forwards'});
+  $('reel').style.opacity='0';
+  $('darkSea').animate([{opacity:0},{opacity:.55}],{duration:3200,fill:'forwards'});
+  for(let i=0;i<14;i++){
+    setTimeout(()=>splashFX(560+Math.random()*120,335,4),i*160);
+  }
+  setTimeout(()=>showResult('sink'),3600);
+}
+
+/* ================= SOAL ================= */
+const catClass={'KONSEP':'c-konsep','BIOTIK':'c-biotik','ABIOTIK':'c-abiotik','INTERAKSI':'c-inter','RANTAI MAKANAN':'c-rantai'};
+function renderQuestion(){
+  const q=deck[cur];answered=false;
+  $('qBadge').textContent='SOAL '+(cur+1);
+  $('qCat').textContent=q.cat;
+  $('qCat').className='q-cat '+catClass[q.cat];
+  $('qText').textContent=q.q;
+  const wrap=$('optsWrap');wrap.innerHTML='';
+  q.opts.forEach((o,i)=>{
+    const b=document.createElement('button');b.className='opt';
+    b.innerHTML=`<span class="key">${'ABCD'[i]}</span><span>${o}</span>`;
+    b.addEventListener('click',()=>pick(i));
+    wrap.appendChild(b);
+  });
+  $('feedback').classList.add('hidden');
+  updateHUD();
+}
+function pick(i){
+  if(answered||gameOver)return;
+  answered=true;
+  const q=deck[cur],btns=[...$('optsWrap').children];
+  btns.forEach((b,idx)=>{b.disabled=true;
+    if(idx===q.a)b.classList.add('is-correct');
+    else if(idx===i)b.classList.add('is-wrong');
+    else b.classList.add('is-dim');});
+  const ok=i===q.a,banner=$('fbBanner');
+  if(ok){
+    okCount++;
+    SFX.catch();catchSequence();
+    floatFX('+1 IKAN! 🐟','#34d399');
+    banner.className='fb-banner ok';
+    banner.textContent='🐟 BENAR! Seekor ikan berhasil ditangkap!';
+  }else{
+    wrongCount++;
+    SFX.wrong();shakeBoat();applyDamage();flashFX();
+    floatFX('KAPAL BERGUNCANG! ❌','#f87171');
+    banner.className='fb-banner no';
+    if(wrongCount>=SINK_AT){
+      banner.textContent='💥 SALAH KE-'+SINK_AT+'! Lambung kapal pecah — air masuk!';
+      gameOver=true;
+    }else{
+      banner.textContent=`🌊 SALAH! Kapal terguncang hebat! (${wrongCount}/${SINK_AT} kesalahan)`;
+    }
+  }
+  $('fbInfo').textContent='💡 '+q.info;
+  $('btnNext').textContent=cur===TOTAL-1?'🏁 LIHAT HASIL':'LANJUT ➜';
+  $('feedback').classList.remove('hidden');
+  if(gameOver&&wrongCount>=SINK_AT){
+    $('btnNext').classList.add('hidden');
+    setTimeout(sinkSequence,1100);
+  }
+  updateHUD();
+}
+$('btnNext').addEventListener('click',()=>{
+  if(gameOver)return;
+  SFX.click();
+  if(cur===TOTAL-1){stopClock();finish();return;}
+  cur++;renderQuestion();
+});
+
+/* ================= AKHIR PERMAINAN ================= */
+function confetti(n){
+  const box=$('confettiBox');box.innerHTML='';
+  const cols=['#fbbf24','#22d3ee','#fb7185','#34d399','#a5b4fc','#f8fafc','#f97316'];
+  for(let i=0;i<n;i++){
+    const d=document.createElement('i');
+    d.style.left=Math.random()*100+'%';
+    d.style.background=cols[i%cols.length];
+    d.style.animationDuration=(2.2+Math.random()*1.8)+'s';
+    d.style.animationDelay=(Math.random()*.9)+'s';
+    d.style.setProperty('--r',(360+Math.random()*560).toFixed(0)+'deg');
+    box.appendChild(d);
+  }
+}
+function rankOf(n){
+  if(n>=20)return'🌟 NELAYAN LEGENDARIS';
+  if(n>=15)return'🏅 NELAYAN ANDAL';
+  if(n>=10)return'🎖 PEMANCING MUDA';
+  if(n>=5)return'🪝 PEMANCING PEMULA';
+  return'🛟 MASIH LATIHAN';
+}
+function statsHTML(){
+  return `<div class="stat"><span class="lab">IKAN</span><br><span class="val" style="color:#22d3ee">🐟 ${okCount}</span></div>
+  <div class="stat"><span class="lab">BENAR</span><br><span class="val" style="color:#34d399">${okCount}/${TOTAL}</span></div>
+  <div class="stat"><span class="lab">SALAH</span><br><span class="val" style="color:#f87171">${wrongCount}</span></div>
+  <div class="stat"><span class="lab">SISA WAKTU</span><br><span class="val" style="color:#fbbf24">${fmt(Math.max(0,timeLeft))}</span></div>`;
+}
+function showResult(mode){ // 'perfect' | 'normal' | 'timeout' | 'sink'
+  const card=$('resCard'),kick=$('resKick'),title=$('resTitle'),rank=$('resRank'),quote=$('resQuote');
+  $('resShip').classList.add('hidden');
+  card.className='ov-card';
+  if(mode==='perfect'){
+    card.classList.add('gold');kick.className='ov-kick gold';kick.textContent='🚢 HADIAH UTAMA DIDAPAT!';
+    title.className='res-title win';title.innerHTML='SEMPURNA 25/25!';
+    $('resShip').classList.remove('hidden');
+    rank.textContent='Kamu mendapatkan KAPAL BESAR sebagai hadiah!';
+    quote.textContent='"Tidak ada satu pun jawaban yang lolos! Kamu resmi menjadi Nahkoda Kehormatan Laut Biotik & Abiotik!" 🌟';
+    confetti(130);SFX.fanfare();
+  }else if(mode==='sink'){
+    card.classList.add('doom');kick.className='ov-kick doom';kick.textContent='🌊 MUSIBAH DI LAUT';
+    title.className='res-title lose';title.innerHTML='KAPAL TENGGELAM…';
+    rank.textContent='Salah '+wrongCount+' kali — lambung tak kuat menahan guncangan.';
+    quote.textContent='"Jangan menyerah, pelaut! Laut masih menunggumu. Pelajari lagi biotik & abiotik, lalu berlayar kembali!" ⚓';
+  }else if(mode==='timeout'){
+    kick.textContent='⏰ WAKTU HABIS';
+    title.className='res-title mid';title.innerHTML='WAKTU MELAUT SELESAI!';
+    rank.textContent=rankOf(okCount);
+    quote.textContent='"Waktu 15 menit sudah habis dengan '+okCount+' ikan tertangkap. Coba lagi dan kejar Kapal Besar!" 🎣';
+  }else{
+    kick.textContent='🏁 PERJALANAN SELESAI';
+    title.className='res-title '+(okCount>=15?'win':'mid');title.innerHTML='SELESAI MELAUT!';
+    rank.textContent=rankOf(okCount);
+    quote.textContent= okCount>=20 ? '"Luar biasa! Sedikit lagi kamu meraih Kapal Besar. Coba sekali lagi!" 🔥'
+      :'"Hasil tangkapan yang bagus! Ulangi lagi untuk menambah ikan dan mengejar Kapal Besar!" 🐟';
+    if(okCount>=15)confetti(70);
+  }
+  $('resStats').innerHTML=statsHTML();
+  $('ovResult').classList.remove('hidden');
+}
+function finish(){
+  gameOver=true;
+  if(okCount===TOTAL){
+    // hadiah kapal besar: kapal kecil pergi, kapal besar datang
+    SFX.horn();
+    $('boatBob').classList.add('sunk');$('reel').classList.add('sunk');
+    const bs=$('bigShip');
+    bs.style.opacity='1';bs.style.transform='translate(0,0)';
+    splashFX(400,336,10);splashFX(850,336,10);
+    floatFX('KAPAL BESAR! 🚢','#fbbf24');
+    setTimeout(()=>showResult('perfect'),2400);
+  }else{
+    setTimeout(()=>showResult('normal'),700);
+  }
+}
+function timeUp(){
+  if(gameOver)return;
+  gameOver=true;
+  $('optsWrap').querySelectorAll('button').forEach(b=>b.disabled=true);
+  setTimeout(()=>showResult('timeout'),900);
+}
+
+/* ================= MULAI / ULANG ================= */
+function resetAll(){
+  cur=0;okCount=0;wrongCount=0;answered=false;gameOver=false;sinking=false;timeLeft=TIME_LIMIT;
+  buildDeck();
+  $('timeVal').textContent=fmt(TIME_LIMIT);
+  $('chipTime').classList.remove('danger');
+  $('deckFish').innerHTML='';
+  $('darkSea').getAnimations().forEach(a=>a.cancel());$('darkSea').setAttribute('opacity',0);
+  $('boatDamage').getAnimations().forEach(a=>a.cancel());$('boatDamage').style.transform='';
+  $('boatBob').classList.remove('sunk');$('reel').classList.remove('sunk');$('reel').style.opacity='';
+  const bs=$('bigShip');bs.style.opacity='0';bs.style.transform='translate(0,40px)';
+  renderQuestion();
+}
+$('btnStart').addEventListener('click',()=>{
+  SFX.click();SFX.horn();
+  $('ovStart').classList.add('hidden');
+  resetAll();startClock();
+});
+$('btnAgain').addEventListener('click',()=>{
+  SFX.click();
+  $('ovResult').classList.add('hidden');
+  resetAll();startClock();
+});
+$('soundBtn').addEventListener('click',function(){this.textContent=SFX.toggle()?'🔊':'🔇';});
+
+/* keyboard */
+document.addEventListener('keydown',e=>{
+  if(!$('ovStart').classList.contains('hidden')||!$('ovResult').classList.contains('hidden'))return;
+  if(answered&&!gameOver&&(e.key==='Enter'||e.key===' ')){$('btnNext').click();return;}
+  const map={'1':0,'2':1,'3':2,'4':3,'a':0,'b':1,'c':2,'d':3};
+  const k=e.key.toLowerCase();
+  if(k in map){const b=$('optsWrap').children[map[k]];if(b&&!b.disabled)b.click();}
+});
+
+/* init */
+buildDeck();renderQuestion();updateHUD();
+</script>
+</body>
+</html>
